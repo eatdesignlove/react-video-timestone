@@ -1,1 +1,1 @@
-# react-video-timestone
+# React Video Timestone
