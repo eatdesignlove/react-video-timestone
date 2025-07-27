@@ -1,0 +1,9 @@
+dist
+node_modules
+build
+coverage
+.vscode
+.idea
+*.lock
+yarn.lock
+package-lock.json 
