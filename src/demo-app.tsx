@@ -1,12 +1,12 @@
-import { Header, Hero } from './ui';
+import { Features, Header, Hero } from './ui';
 import * as styles from './demo-app.css';
 
 function DemoApp() {
   return (
     <div className={styles.container}>
       <Header />
-      {/* 히어로 섹션 */}
       <Hero />
+      <Features />
 
       <main className={styles.main}>
         {/* 여러 영상 전환 데모 */}
