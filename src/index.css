@@ -2,4 +2,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  /* 폰트 렌더링 최적화 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }

@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import { VideoTimeline, TimelineRef } from '../lib';
 import * as styles from './demo-app.css';
 import { Header } from './ui';
+import Hero from './ui/hero';
 
 function DemoApp() {
   const timelineRef = useRef<TimelineRef>(null);
@@ -122,164 +123,7 @@ function DemoApp() {
     <div className={styles.container}>
       <Header />
       {/* 히어로 섹션 */}
-      <section className={styles.heroSection}>
-        {/* 배경 영상 */}
-        <div className={styles.heroVideoBackground}>
-          {!isLoaded && (
-            <div className={styles.heroLoadingOverlay}>
-              <div className={styles.heroLoadingContent}>
-                <div className={styles.heroProgressBar}>
-                  ㅑ
-                  <div
-                    className={styles.heroProgressFill}
-                    style={{ width: `${loadingProgress}%` }}
-                  />
-                </div>
-                <span>영상 로딩 중... {Math.round(loadingProgress)}%</span>
-              </div>
-            </div>
-          )}
-          <VideoTimeline
-            ref={timelineRef}
-            className={styles.heroBackgroundVideo}
-            videoUrls={['/demo2.mp4']}
-            markers={subtitleMarkers}
-            onLoading={progress => setLoadingProgress(progress)}
-            onLoaded={() => setIsLoaded(true)}
-            onReady={() => {
-              setTimeout(() => {
-                const videoElement = document.querySelector('video');
-                if (videoElement && videoElement.duration) {
-                  setVideoDuration(videoElement.duration);
-                }
-                // 히어로 영상 자동 재생 시작
-                timelineRef.current?.play();
-              }, 500);
-            }}
-            onStateChange={({ isPlaying }) => setIsPlaying(isPlaying)}
-          />
-        </div>
-
-        {/* 그라데이션 오버레이 */}
-        <div className={styles.heroOverlay}>
-          <div className={styles.heroContent}>
-            <div className={styles.heroText}>
-              <h1 className={styles.heroTitle}>
-                React Video
-                <span className={styles.gradientText}>Timestone</span>
-              </h1>
-              <p className={styles.heroSubtitle}>
-                직접 만들려면 번거로운 비디오 기능들을 간단한 API로 제공합니다.
-              </p>
-              <div className={styles.heroFeatures}>
-                <div className={styles.featureBadge}>⏯️ 부드러운 역재생</div>
-                <div className={styles.featureBadge}>🚀 버퍼링 없는 재생</div>
-                <div className={styles.featureBadge}>
-                  🎬 멀티 비디오 타임라인
-                </div>
-                <div className={styles.featureBadge}>📍 정밀한 마커 이벤트</div>
-              </div>
-
-              {/* 프로그래매틱 제어 */}
-              <div className={styles.syncIndicator}>
-                <h4 className={styles.heroControlsTitle}>
-                  ⏯️ 직접 제어해보세요
-                </h4>
-                <div className={styles.controlGroup}>
-                  <button
-                    className={styles.controlButton}
-                    onClick={handlePlay}
-                    disabled={isPlaying}
-                  >
-                    ▶️ 재생
-                  </button>
-                  <button
-                    className={styles.controlButton}
-                    onClick={handlePause}
-                    disabled={!isPlaying}
-                  >
-                    ⏸️ 일시정지
-                  </button>
-                  <button
-                    className={styles.controlButton}
-                    onClick={handleRewind}
-                  >
-                    ⏪ 리와인드
-                  </button>
-                </div>
-
-                <div className={styles.progressSection}>
-                  <span className={styles.controlLabel}>빠른 이동:</span>
-                  <div className={styles.progressContainer}>
-                    <div className={styles.progressTrack}>
-                      {/* 현재 재생 위치 표시 */}
-                      <div
-                        className={styles.progressPlaybackFill}
-                        style={{
-                          width: videoDuration
-                            ? `${(currentTime / videoDuration) * 100}%`
-                            : '0%',
-                        }}
-                      />
-
-                      {/* 자막 마커들 표시 */}
-                      {subtitleMarkers
-                        .filter(
-                          marker =>
-                            marker.time > 0 && marker.time < videoDuration
-                        )
-                        .map((marker, index) => (
-                          <div
-                            key={`subtitle-marker-${index}`}
-                            className={styles.subtitleMarker}
-                            style={{
-                              left: `${(marker.time / videoDuration) * 100}%`,
-                            }}
-                            title={`자막 ${index + 1}: ${formatTime(marker.time)}`}
-                          />
-                        ))}
-
-                      <div
-                        className={styles.progressMarker}
-                        style={{ left: '33.33%' }}
-                        onClick={() => handleSeekTo(videoDuration / 3)}
-                        title="1/3 지점"
-                      />
-                      <div
-                        className={styles.progressMarker}
-                        style={{ left: '50%' }}
-                        onClick={() => handleSeekTo(videoDuration / 2)}
-                        title="1/2 지점"
-                      />
-                      <div
-                        className={styles.progressMarker}
-                        style={{ left: '66.66%' }}
-                        onClick={() => handleSeekTo((videoDuration * 2) / 3)}
-                        title="2/3 지점"
-                      />
-                    </div>
-                    {/* 시간 표시 */}
-                    <div className={styles.progressTimeDisplay}>
-                      <span>{formatTime(currentTime)}</span>
-                      <span>{formatTime(videoDuration)}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        {/* 자막 표시 */}
-        {currentSubtitle && (
-          <div
-            className={
-              styles.subtitleContainer + ' ' + styles.heroSubtitlePosition
-            }
-          >
-            <p className={styles.subtitleText}>{currentSubtitle}</p>
-          </div>
-        )}
-      </section>
+      <Hero />
 
       <main className={styles.main}>
         {/* 여러 영상 전환 데모 */}
@@ -424,3 +268,156 @@ import { VideoTimeline } from 'react-video-timestone';
 }
 
 export default DemoApp;
+
+// const DemoSection = () => {
+//   return (
+//     <section className={styles.heroSection}>
+//       <div className={styles.heroVideoBackground}>
+//         {!isLoaded && (
+//           <div className={styles.heroLoadingOverlay}>
+//             <div className={styles.heroLoadingContent}>
+//               <div className={styles.heroProgressBar}>
+//                 ㅑ
+//                 <div
+//                   className={styles.heroProgressFill}
+//                   style={{ width: `${loadingProgress}%` }}
+//                 />
+//               </div>
+//               <span>영상 로딩 중... {Math.round(loadingProgress)}%</span>
+//             </div>
+//           </div>
+//         )}
+//         <VideoTimeline
+//           ref={timelineRef}
+//           className={styles.heroBackgroundVideo}
+//           videoUrls={['/demo2.mp4']}
+//           markers={subtitleMarkers}
+//           onLoading={progress => setLoadingProgress(progress)}
+//           onLoaded={() => setIsLoaded(true)}
+//           onReady={() => {
+//             setTimeout(() => {
+//               const videoElement = document.querySelector('video');
+//               if (videoElement && videoElement.duration) {
+//                 setVideoDuration(videoElement.duration);
+//               }
+//               // 히어로 영상 자동 재생 시작
+//               timelineRef.current?.play();
+//             }, 500);
+//           }}
+//           onStateChange={({ isPlaying }) => setIsPlaying(isPlaying)}
+//         />
+//       </div>
+
+//       <div className={styles.heroOverlay}>
+//         <div className={styles.heroContent}>
+//           <div className={styles.heroText}>
+//             <h1 className={styles.heroTitle}>
+//               React Video
+//               <span className={styles.gradientText}>Timestone</span>
+//             </h1>
+//             <p className={styles.heroSubtitle}>
+//               직접 만들려면 번거로운 비디오 기능들을 간단한 API로 제공합니다.
+//             </p>
+//             <div className={styles.heroFeatures}>
+//               <div className={styles.featureBadge}>⏯️ 부드러운 역재생</div>
+//               <div className={styles.featureBadge}>🚀 버퍼링 없는 재생</div>
+//               <div className={styles.featureBadge}>🎬 멀티 비디오 타임라인</div>
+//               <div className={styles.featureBadge}>📍 정밀한 마커 이벤트</div>
+//             </div>
+
+//             {/* 프로그래매틱 제어 */}
+//             <div className={styles.syncIndicator}>
+//               <h4 className={styles.heroControlsTitle}>⏯️ 직접 제어해보세요</h4>
+//               <div className={styles.controlGroup}>
+//                 <button
+//                   className={styles.controlButton}
+//                   onClick={handlePlay}
+//                   disabled={isPlaying}
+//                 >
+//                   ▶️ 재생
+//                 </button>
+//                 <button
+//                   className={styles.controlButton}
+//                   onClick={handlePause}
+//                   disabled={!isPlaying}
+//                 >
+//                   ⏸️ 일시정지
+//                 </button>
+//                 <button className={styles.controlButton} onClick={handleRewind}>
+//                   ⏪ 리와인드
+//                 </button>
+//               </div>
+
+//               <div className={styles.progressSection}>
+//                 <span className={styles.controlLabel}>빠른 이동:</span>
+//                 <div className={styles.progressContainer}>
+//                   <div className={styles.progressTrack}>
+//                     {/* 현재 재생 위치 표시 */}
+//                     <div
+//                       className={styles.progressPlaybackFill}
+//                       style={{
+//                         width: videoDuration
+//                           ? `${(currentTime / videoDuration) * 100}%`
+//                           : '0%',
+//                       }}
+//                     />
+
+//                     {/* 자막 마커들 표시 */}
+//                     {subtitleMarkers
+//                       .filter(
+//                         marker => marker.time > 0 && marker.time < videoDuration
+//                       )
+//                       .map((marker, index) => (
+//                         <div
+//                           key={`subtitle-marker-${index}`}
+//                           className={styles.subtitleMarker}
+//                           style={{
+//                             left: `${(marker.time / videoDuration) * 100}%`,
+//                           }}
+//                           title={`자막 ${index + 1}: ${formatTime(marker.time)}`}
+//                         />
+//                       ))}
+
+//                     <div
+//                       className={styles.progressMarker}
+//                       style={{ left: '33.33%' }}
+//                       onClick={() => handleSeekTo(videoDuration / 3)}
+//                       title="1/3 지점"
+//                     />
+//                     <div
+//                       className={styles.progressMarker}
+//                       style={{ left: '50%' }}
+//                       onClick={() => handleSeekTo(videoDuration / 2)}
+//                       title="1/2 지점"
+//                     />
+//                     <div
+//                       className={styles.progressMarker}
+//                       style={{ left: '66.66%' }}
+//                       onClick={() => handleSeekTo((videoDuration * 2) / 3)}
+//                       title="2/3 지점"
+//                     />
+//                   </div>
+//                   {/* 시간 표시 */}
+//                   <div className={styles.progressTimeDisplay}>
+//                     <span>{formatTime(currentTime)}</span>
+//                     <span>{formatTime(videoDuration)}</span>
+//                   </div>
+//                 </div>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+//       {/* 자막 표시 */}
+//       {currentSubtitle && (
+//         <div
+//           className={
+//             styles.subtitleContainer + ' ' + styles.heroSubtitlePosition
+//           }
+//         >
+//           <p className={styles.subtitleText}>{currentSubtitle}</p>
+//         </div>
+//       )}
+//     </section>
+//   );
+// };
