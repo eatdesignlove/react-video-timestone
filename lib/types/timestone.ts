@@ -1,4 +1,5 @@
 export type TimelineRef = {
+  videoElement: HTMLVideoElement | undefined;
   play: () => void;
   pause: () => void;
   rewind: () => void;
@@ -79,4 +80,6 @@ export interface IVideoControlProps {
 export interface IOnStateChangeProps {
   isPlaying: boolean;
   playerState: PlayerState;
+  isRewind: boolean;
+  currentTime?: number;
 }

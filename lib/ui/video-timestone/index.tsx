@@ -50,6 +50,7 @@ export default function VideoTimeline({
       onStateChange: onStateChange,
     });
   useImperativeHandle(ref, () => ({
+    videoElement: videoPlayerRef.current || undefined,
     play,
     pause,
     rewind,

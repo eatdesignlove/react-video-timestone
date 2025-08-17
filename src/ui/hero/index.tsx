@@ -1,3 +1,4 @@
+import Demo from '../demo';
 import * as styles from './hero.css';
 
 export default function Hero() {
@@ -13,6 +14,9 @@ export default function Hero() {
           <br /> Make your interactive web experience truly extraordinary.
         </p>
         <button className={styles.button}>Get Started</button>
+      </div>
+      <div className={styles.demoContainer}>
+        <Demo />
       </div>
     </section>
   );

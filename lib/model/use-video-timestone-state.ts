@@ -96,7 +96,9 @@ export const useVideoTimelineState = ({
 
     onStateChange?.({
       isPlaying: state.playerState === 'PLAYING',
+      isRewind: state.playDirection === 'BACKWARD',
       playerState: state.playerState,
+      currentTime: ref.current?.currentTime,
     });
   }, [state.playerState]);
 
