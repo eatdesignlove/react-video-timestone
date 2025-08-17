@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { VideoTimeline, TimelineRef } from '../lib';
 import * as styles from './demo-app.css';
+import { Header } from './ui';
 
 function DemoApp() {
   const timelineRef = useRef<TimelineRef>(null);
@@ -119,6 +120,7 @@ function DemoApp() {
 
   return (
     <div className={styles.container}>
+      <Header />
       {/* 히어로 섹션 */}
       <section className={styles.heroSection}>
         {/* 배경 영상 */}
@@ -127,6 +129,7 @@ function DemoApp() {
             <div className={styles.heroLoadingOverlay}>
               <div className={styles.heroLoadingContent}>
                 <div className={styles.heroProgressBar}>
+                  ㅑ
                   <div
                     className={styles.heroProgressFill}
                     style={{ width: `${loadingProgress}%` }}
