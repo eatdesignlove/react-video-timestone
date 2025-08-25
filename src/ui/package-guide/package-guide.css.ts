@@ -27,3 +27,7 @@ export const subTitle = style({
 export const contentWrapper = style({
   marginBottom: '40px',
 });
+
+export const codeBlock = style({
+  fontFamily: 'monospace !important',
+});
