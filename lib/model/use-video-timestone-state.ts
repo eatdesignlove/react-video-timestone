@@ -100,7 +100,7 @@ export const useVideoTimelineState = ({
       playerState: state.playerState,
       currentTime: ref.current?.currentTime,
     });
-  }, [state.playerState]);
+  }, [state.playerState]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return {
     state,
