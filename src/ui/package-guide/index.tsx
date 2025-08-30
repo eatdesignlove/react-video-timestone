@@ -141,6 +141,45 @@ function App() {
             {...codeBlockProps}
           />
         </div>
+        <div className={styles.contentWrapper}>
+          <h2 className={styles.subTitle}>Marker Directions</h2>
+          <CopyBlock
+            language="tsx"
+            text={`import { VideoTimestone } from 'react-video-timestone';
+
+function App() {
+  const markers = [
+    {
+      time: 2.0,
+      label: 'forward-only',
+      direction: 'FORWARD',  // Only triggers when playing forward
+      callback: () => console.log('Forward playback marker'),
+    },
+    {
+      time: 5.0,
+      label: 'backward-only', 
+      direction: 'BACKWARD', // Only triggers when playing backward
+      callback: () => console.log('Backward playback marker'),
+    },
+    {
+      time: 8.0,
+      label: 'both-directions',
+      direction: 'BOTH',     // Triggers in both directions (default)
+      callback: () => console.log('Bi-directional marker'),
+    },
+  ];
+
+  return (
+    <VideoTimestone
+      videoUrls={['/video.mp4']}
+      markers={markers}
+      onReady={() => console.log('Direction-based markers ready!')}
+    />
+  );
+}`}
+            {...codeBlockProps}
+          />
+        </div>
       </section>
       <section>
         <h1 className={styles.title}>API</h1>
@@ -175,6 +214,7 @@ interface Marker {
   label: string;                 // Marker identifier
   time: number;                  // Time in seconds
   type?: 'pause';               // Auto-pause at marker
+  direction?: 'FORWARD' | 'BACKWARD' | 'BOTH'; // Playback direction filter
   callback?: () => void;         // Callback function
 }`}
             {...codeBlockProps}
