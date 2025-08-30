@@ -20,11 +20,14 @@ export type PlayerState =
 
 export type PlayDirection = 'FORWARD' | 'BACKWARD';
 
+export type MarkerDirection = 'FORWARD' | 'BACKWARD' | 'BOTH';
+
 export type Marker = {
   videoIndex?: number;
   label: string;
   time: number;
   type?: 'pause';
+  direction?: MarkerDirection;
   callback?: () => void;
   triggerPause?: () => void;
 };

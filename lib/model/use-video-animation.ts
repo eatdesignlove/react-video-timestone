@@ -61,7 +61,18 @@ export const useVideoAnimation = ({
         ) {
           return null;
         }
+
         const isForward = playDirection.current === 'FORWARD';
+        const markerDirection = marker.direction || 'BOTH';
+
+        // 마커 방향 필터링
+        if (markerDirection === 'FORWARD' && !isForward) {
+          return null;
+        }
+        if (markerDirection === 'BACKWARD' && isForward) {
+          return null;
+        }
+
         const prevTime = Number(prevCurrentTime.toFixed(2));
         const markerTime = Number(marker.time.toFixed(2));
         const current = Number(newCurrentTime.toFixed(2));
