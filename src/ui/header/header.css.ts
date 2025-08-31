@@ -10,7 +10,15 @@ export const container = style({
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
-  padding: '40px 48px',
+  padding: '16px 20px',
+  '@media': {
+    '(min-width: 481px)': {
+      padding: '20px 24px',
+    },
+    '(min-width: 769px)': {
+      padding: '40px 48px',
+    },
+  },
 });
 
 export const logo = style({
@@ -22,17 +30,28 @@ export const logo = style({
 
 export const packageLinks = style({
   display: 'flex',
-  gap: '24px',
+  gap: '16px',
   color: 'white',
+  '@media': {
+    '(min-width: 481px)': {
+      gap: '24px',
+    },
+  },
 });
 
 export const link = style({
   display: 'flex',
   alignItems: 'center',
-  gap: '8px',
+  gap: '4px',
   color: 'white',
   textDecoration: 'none',
   fontFamily: 'Inter',
-  fontSize: '14px',
+  fontSize: '12px',
   fontWeight: 'bold',
+  '@media': {
+    '(min-width: 481px)': {
+      fontSize: '14px',
+      gap: '8px',
+    },
+  },
 });

@@ -7,21 +7,43 @@ export const container = style({
   maxWidth: '1000px',
   width: '100%',
   margin: '0 auto',
-  paddingTop: '120px',
+  paddingTop: '80px',
+  padding: '80px 20px 0',
+  '@media': {
+    '(min-width: 769px)': {
+      paddingTop: '120px',
+      padding: '120px 20px 0',
+    },
+  },
 });
 
 export const title = style({
-  fontSize: '36px',
+  fontSize: '24px',
   fontWeight: 600,
-  marginBottom: '70px',
+  marginBottom: '40px',
   fontFamily: 'Belanosima',
+  '@media': {
+    '(min-width: 769px)': {
+      fontSize: '28px',
+      marginBottom: '70px',
+    },
+    '(min-width: 1024px)': {
+      fontSize: '36px',
+    },
+  },
 });
 
 export const subTitle = style({
-  fontSize: '24px',
+  fontSize: '20px',
   fontWeight: 400,
-  marginBottom: '33px',
+  marginBottom: '20px',
   fontFamily: 'Belanosima',
+  '@media': {
+    '(min-width: 769px)': {
+      fontSize: '24px',
+      marginBottom: '33px',
+    },
+  },
 });
 
 export const contentWrapper = style({

@@ -342,12 +342,17 @@ export const controlGroup = style({
   left: '50%',
   transform: 'translate(-50%, -50%)',
   display: 'flex',
-  gap: '12px',
+  gap: '8px',
   alignItems: 'center',
   justifyContent: 'center',
   flexWrap: 'wrap',
   margin: '0 auto',
   zIndex: 200,
+  '@media': {
+    '(min-width: 481px)': {
+      gap: '12px',
+    },
+  },
 });
 
 export const controlButton = style({
@@ -357,9 +362,15 @@ export const controlButton = style({
   background: '#fff',
   borderRadius: '100%',
   cursor: 'pointer',
-  width: '70px',
-  height: '70px',
+  width: '60px',
+  height: '60px',
   border: 'none',
+  '@media': {
+    '(min-width: 481px)': {
+      width: '70px',
+      height: '70px',
+    },
+  },
 
   ':hover': {
     background: colors.accent,
@@ -563,17 +574,24 @@ export const progressSection = style({
 
 export const progressContainer = style({
   position: 'absolute',
-  bottom: '30px',
+  bottom: '20px',
   left: 0,
   right: 0,
   zIndex: 1000,
   width: '100%',
-  gap: '16px',
+  gap: '12px',
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
   color: 'white',
-  padding: '0 24px',
+  padding: '0 16px',
+  '@media': {
+    '(min-width: 481px)': {
+      bottom: '30px',
+      padding: '0 24px',
+      gap: '16px',
+    },
+  },
 });
 
 export const progressTime = style({
@@ -638,22 +656,34 @@ export const subtitleContainer = style({
   zIndex: 10,
   display: 'flex',
   justifyContent: 'center',
-  bottom: '90px',
+  bottom: '80px',
   textAlign: 'center',
   animation: `${fadeInUp} 0.8s ease-out`,
   pointerEvents: 'none',
+  padding: '0 20px',
+  '@media': {
+    '(min-width: 481px)': {
+      bottom: '90px',
+    },
+  },
 });
 
 export const subtitleText = style({
-  fontSize: '16px',
+  fontSize: '14px',
   color: colors.textPrimary,
   fontWeight: 700,
   lineHeight: 1.4,
   textShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
   letterSpacing: '0.5px',
   textAlign: 'center',
-  maxWidth: '600px',
+  maxWidth: '90%',
   wordBreak: 'keep-all',
+  '@media': {
+    '(min-width: 481px)': {
+      fontSize: '16px',
+      maxWidth: '600px',
+    },
+  },
 });
 
 export const subtitleMarker = style({
