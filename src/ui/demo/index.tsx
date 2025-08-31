@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import cx from 'classnames';
 import { IoPauseSharp, IoPlayBackSharp, IoPlaySharp } from 'react-icons/io5';
-import { VideoTimeline, TimelineRef } from '../../../lib';
+import { VideoTimestone, TimelineRef } from '../../../lib';
 import * as styles from './demo.css';
 
 const PLAY_STATE = {
@@ -272,7 +272,7 @@ export default function Demo() {
             </div>
           </div>
         )}
-        <VideoTimeline
+        <VideoTimestone
           ref={timelineRef}
           className={styles.heroBackgroundVideo}
           videoUrls={['/demo2.mp4']}

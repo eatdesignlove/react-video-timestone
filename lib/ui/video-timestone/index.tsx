@@ -7,7 +7,7 @@ import { IOnStateChangeProps, Marker, TimelineRef } from '../../types';
 import * as styles from './video-timestone.css';
 import { VideoTimelineContext } from '../../model/video-timestone-context';
 
-export default function VideoTimeline({
+export default function VideoTimestone({
   speed,
   className,
   videoUrls,
