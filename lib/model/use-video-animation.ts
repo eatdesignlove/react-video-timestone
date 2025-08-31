@@ -5,10 +5,10 @@ export const useVideoAnimation = ({
   videoRef,
   onEnded,
   speed = 1.0,
-  fps = 30,
   videoCount,
   playIndex,
 }: IUseVideoAnimationProps) => {
+  const updateIntervalMs = 1000 / 30; // 30fps 고정
   const animationFrameId = useRef<number | null>(null);
   const playDirection = useRef<'FORWARD' | 'BACKWARD'>('FORWARD');
   const startTime = useRef<number>(0);
@@ -116,7 +116,7 @@ export const useVideoAnimation = ({
       // 프레임 시간 확인
       const elapsed = timestamp - lastTimestamp;
 
-      if (elapsed >= 1000 / (!fps ? 60 : fps)) {
+      if (elapsed >= updateIntervalMs) {
         const deltaTime = (elapsed / 1000) * speed;
         lastTimestamp = timestamp;
 

@@ -56,7 +56,6 @@ export type TimelineAction =
 export interface IUseVideoAnimationProps {
   videoRef: React.RefObject<HTMLVideoElement | null>;
   speed?: number;
-  fps?: number;
   onEnded: ({ isTimelineEnded }: { isTimelineEnded?: boolean }) => void;
   playIndex: number;
   videoCount: number;

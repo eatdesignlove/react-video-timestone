@@ -9,7 +9,6 @@ import { VideoTimelineContext } from '../../model/video-timestone-context';
 
 export default function VideoTimeline({
   speed,
-  fps,
   className,
   videoUrls,
   markers,
@@ -22,7 +21,6 @@ export default function VideoTimeline({
   fullScreen,
   ref,
 }: {
-  fps?: number;
   speed?: number;
   posters?: string[];
   className?: string;
@@ -41,7 +39,6 @@ export default function VideoTimeline({
     useVideoTimelineState({
       ref: videoPlayerRef,
       speed,
-      fps,
       videoUrls,
       markers,
       onLoading,

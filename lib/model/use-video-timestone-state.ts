@@ -10,7 +10,6 @@ export const useVideoTimelineState = ({
   markers,
   videoUrls,
   speed,
-  fps,
   onLoading,
   onReady,
   onLoaded,
@@ -18,7 +17,6 @@ export const useVideoTimelineState = ({
 }: {
   ref: React.RefObject<HTMLVideoElement | null>;
   speed?: number;
-  fps?: number;
   markers?: Marker[];
   videoUrls: string[];
   onLoading?: (progress: number) => void;
@@ -38,7 +36,6 @@ export const useVideoTimelineState = ({
   const { play, pause, seekTo, reverse, addMarkers } = useVideoAnimation({
     videoRef: ref,
     speed,
-    fps,
     playIndex: state.playIndex,
     videoCount: state.loadedVideoUrls.length,
     onEnded: ({ isTimelineEnded }) =>
