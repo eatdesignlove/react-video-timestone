@@ -13,7 +13,7 @@ export default function Features() {
       <div className={styles.sectionHeader}>
         <h1 className={styles.title}>
           Video Control <br /> for{' '}
-          <span className={styles.highlight}>Storyteling Website</span>
+          <span className={styles.highlight}>Storytelling Website</span>
         </h1>
         <p className={styles.description}>
           React Video Timestone is a React component built for video-based

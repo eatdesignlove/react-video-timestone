@@ -27,15 +27,17 @@ export default function PackageGuide() {
           <h2 className={styles.subTitle}>Prepare Video (GOP 1)</h2>
           <CopyBlock
             language="bash"
-            text={
-              'ffmpeg -i input.mp4 -g 1 -keyint_min 1 -c:v libx264 -crf 18 output.mp4'
-            }
+            text={`# Basic GOP-1 conversion
+ffmpeg -i input.mp4 -g 1 output-gop1.mp4
+
+# With quality adjustment if needed
+ffmpeg -i input.mp4 -g 1 -c:v libx264 -crf 23 output-gop1.mp4`}
             {...codeBlockProps}
           />
         </div>
       </section>
       <section>
-        <h1 className={styles.title}>Examples</h1>
+        <h1 className={styles.title}>Usage</h1>
         <div className={styles.contentWrapper}>
           <h2 className={styles.subTitle}>Basic</h2>
           <CopyBlock
@@ -46,6 +48,7 @@ function App() {
   return (
     <VideoTimestone
       videoUrls={['/video.mp4']}
+      controls
       onReady={() => console.log('Video ready!')}
     />
   );
@@ -67,8 +70,9 @@ function App() {
       {isLoading && <div>Loading videos...</div>}
       <VideoTimestone
         videoUrls={['/video1.mp4', '/video2.mp4']}
+        onLoading={(progress) => console.log('Progress:', progress + '%')}
+        onLoaded={() => console.log('Download complete')}
         onReady={() => setIsLoading(false)}
-        onError={(error) => console.error('Load failed:', error)}
       />
     </div>
   );
@@ -80,7 +84,7 @@ function App() {
           <h2 className={styles.subTitle}>Add Marker</h2>
           <CopyBlock
             language="tsx"
-            text={`import { VideoTimestone } from 'react-video-timestone';
+            text={`import { VideoTimestone, MARKER_ACTION } from 'react-video-timestone';
 
 function App() {
   const markers = [
@@ -88,6 +92,7 @@ function App() {
       time: 2.5,
       videoIndex: 0,
       label: 'intro-end',
+      action: MARKER_ACTION.PAUSE,
       callback: () => console.log('Intro finished!'),
     },
     {
@@ -121,7 +126,7 @@ function App() {
 
   const handlePlay = () => timelineRef.current?.play();
   const handlePause = () => timelineRef.current?.pause();
-  const handleSeek = (time) => timelineRef.current?.seek(time);
+  const handleSeek = (time) => timelineRef.current?.seekTo({ time, autoPlay: true });
 
   return (
     <div>
@@ -133,7 +138,7 @@ function App() {
       <div>
         <button onClick={handlePlay}>Play</button>
         <button onClick={handlePause}>Pause</button>
-        <button onClick={() => handleSeek(10)}>Seek to 10s</button>
+        <button onClick={() => handleSeek(10)}>Jump to 10s</button>
       </div>
     </div>
   );
@@ -145,26 +150,26 @@ function App() {
           <h2 className={styles.subTitle}>Marker Directions</h2>
           <CopyBlock
             language="tsx"
-            text={`import { VideoTimestone } from 'react-video-timestone';
+            text={`import { VideoTimestone, MARKER_DIRECTION } from 'react-video-timestone';
 
 function App() {
   const markers = [
     {
       time: 2.0,
       label: 'forward-only',
-      direction: 'FORWARD',  // Only triggers when playing forward
+      direction: MARKER_DIRECTION.FORWARD,  // Only triggers when playing forward
       callback: () => console.log('Forward playback marker'),
     },
     {
       time: 5.0,
       label: 'backward-only', 
-      direction: 'BACKWARD', // Only triggers when playing backward
+      direction: MARKER_DIRECTION.BACKWARD, // Only triggers when playing backward
       callback: () => console.log('Backward playback marker'),
     },
     {
       time: 8.0,
       label: 'both-directions',
-      direction: 'BOTH',     // Triggers in both directions (default)
+      direction: MARKER_DIRECTION.BOTH,     // Triggers in both directions (default)
       callback: () => console.log('Bi-directional marker'),
     },
   ];
@@ -187,34 +192,43 @@ function App() {
           <h2 className={styles.subTitle}>Props</h2>
           <CopyBlock
             language="typescript"
-            text={`interface VideoTimelineProps {
-  videoUrls: string[];           // Array of video file URLs
-  markers?: Marker[];            // Timeline markers for events
+            text={`// Constants for better developer experience
+export const MARKER_DIRECTION = {
+  FORWARD: 'FORWARD',
+  BACKWARD: 'BACKWARD', 
+  BOTH: 'BOTH',
+} as const;
+
+export const MARKER_ACTION = {
+  CONTINUE: 'continue',
+  PAUSE: 'pause',
+} as const;
+
+type MarkerDirection = typeof MARKER_DIRECTION[keyof typeof MARKER_DIRECTION];
+type MarkerAction = typeof MARKER_ACTION[keyof typeof MARKER_ACTION];
+
+interface VideoTimestoneProps {
+  videoUrls: string[];           // Array of video URLs (required)
+  markers?: Marker[];            // Timeline markers
   speed?: number;                // Playback speed (default: 1)
-  fps?: number;                  // Frame rate (default: 30)
-  controls?: boolean;            // Show playback controls
-  fullScreen?: boolean;          // Enable fullscreen mode
+  controls?: boolean;            // Show default controls
+  fullScreen?: boolean;          // Fullscreen mode
   className?: string;            // Custom CSS class
-  posters?: string[];            // Poster images for videos
+  posters?: string[];            // Poster images for each video
   
   // Event callbacks
-  onLoading?: (progress: number) => void;
-  onLoaded?: () => void;
-  onReady?: () => void;
-  onStateChange?: (state: {
-    isPlaying: boolean;
-    playerState: PlayerState;
-    isRewind: boolean;
-    currentTime?: number;
-  }) => void;
+  onLoading?: (progress: number) => void;    // Download progress (0-100)
+  onLoaded?: () => void;                     // All videos downloaded and blob converted
+  onReady?: () => void;                      // Video elements ready for playback
+  onStateChange?: (state) => void;           // State change callback
 }
 
 interface Marker {
   videoIndex?: number;           // Video index (default: 0)
-  label: string;                 // Marker identifier
+  label: string;                 // Marker label
   time: number;                  // Time in seconds
-  action?: 'continue' | 'pause'; // Marker action (default: 'continue')
-  direction?: 'FORWARD' | 'BACKWARD' | 'BOTH'; // Playback direction filter
+  action?: MarkerAction;         // Marker action (default: 'continue')
+  direction?: MarkerDirection;   // Playback direction filter
   callback?: () => void;         // Callback function
 }`}
             {...codeBlockProps}
