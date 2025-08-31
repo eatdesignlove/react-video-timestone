@@ -1,7 +1,12 @@
 import { useRef, useState, useEffect, forwardRef } from 'react';
 import cx from 'classnames';
 import { IoPauseSharp, IoPlayBackSharp, IoPlaySharp } from 'react-icons/io5';
-import { VideoTimestone, TimelineRef, MARKER_DIRECTION } from '../../../lib';
+import {
+  VideoTimestone,
+  TimelineRef,
+  MARKER_DIRECTION,
+  MARKER_ACTION,
+} from '../../../lib';
 import * as styles from './demo.css';
 
 const PLAY_STATE = {
@@ -190,7 +195,8 @@ const Demo = forwardRef<HTMLElement>((_, ref) => {
     {
       time: 45.0,
       label: 'clear',
-      direction: MARKER_DIRECTION.FORWARD,
+      direction: MARKER_DIRECTION.BOTH,
+      action: MARKER_ACTION.PAUSE,
       callback: () => setCurrentSubtitle(''),
     },
     {
@@ -300,8 +306,6 @@ const Demo = forwardRef<HTMLElement>((_, ref) => {
               if (videoElement && videoElement.duration) {
                 setVideoDuration(videoElement.duration);
               }
-              // 히어로 영상 자동 재생 시작
-              timelineRef.current?.play();
             }, 500);
           }}
         />
