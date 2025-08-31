@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import cx from 'classnames';
 import { IoPauseSharp, IoPlayBackSharp, IoPlaySharp } from 'react-icons/io5';
-import { VideoTimestone, TimelineRef } from '../../../lib';
+import { VideoTimestone, TimelineRef, MARKER_DIRECTION, MARKER_ACTION } from '../../../lib';
 import * as styles from './demo.css';
 
 const PLAY_STATE = {
@@ -88,19 +88,19 @@ export default function Demo() {
     {
       time: 0,
       label: 'clear',
-      direction: 'BOTH' as const,
+      direction: MARKER_DIRECTION.BOTH,
       callback: () => setCurrentSubtitle(''),
     },
     {
       time: 1.03,
       label: 'clear',
-      direction: 'BACKWARD' as const,
+      direction: MARKER_DIRECTION.BACKWARD,
       callback: () => setCurrentSubtitle(''),
     },
     {
       time: 1.03,
       label: 'dialogue-1',
-      direction: 'FORWARD' as const,
+      direction: MARKER_DIRECTION.FORWARD,
       callback: () =>
         setCurrentSubtitle(
           '여기 오느라 마지막 돈까지 썼어요. 표를 구했고, 당신은 믿음으로 치유된다고 말하네요.'
@@ -109,7 +109,7 @@ export default function Demo() {
     {
       time: 7.09,
       label: 'dialogue-1-backward',
-      direction: 'BACKWARD' as const,
+      direction: MARKER_DIRECTION.BACKWARD,
       callback: () =>
         setCurrentSubtitle(
           '여기 오느라 마지막 돈까지 썼어요. 표를 구했고, 당신은 믿음으로 치유된다고 말하네요.'
@@ -118,8 +118,8 @@ export default function Demo() {
     {
       time: 7.09,
       label: 'dialogue-2',
-      direction: 'FORWARD' as const,
-      action: 'pause',
+      direction: MARKER_DIRECTION.FORWARD,
+      action: MARKER_ACTION.PAUSE,
       callback: () =>
         setCurrentSubtitle(
           '당신은 열쇠구멍을 통해 세상을 보는 사람이에요. 평생 그 열쇠구멍을 넓히려 애썼죠. 더 많이 보고, 더 많이 알기 위해서요. 그리고 이제, 그 열쇠구멍이 상상도 못할 방식으로 넓어질 수 있다는 말을 듣고도, 그 가능성을 거부하네요.'
@@ -128,7 +128,7 @@ export default function Demo() {
     {
       time: 21.07,
       label: 'dialogue-2-backward',
-      direction: 'BACKWARD' as const,
+      direction: MARKER_DIRECTION.BACKWARD,
       callback: () =>
         setCurrentSubtitle(
           '당신은 열쇠구멍을 통해 세상을 보는 사람이에요. 평생 그 열쇠구멍을 넓히려 애썼죠. 더 많이 보고, 더 많이 알기 위해서요. 그리고 이제, 그 열쇠구멍이 상상도 못할 방식으로 넓어질 수 있다는 말을 듣고도, 그 가능성을 거부하네요.'
@@ -137,7 +137,7 @@ export default function Demo() {
     {
       time: 21.07,
       label: 'dialogue-3',
-      direction: 'FORWARD' as const,
+      direction: MARKER_DIRECTION.FORWARD,
       callback: () =>
         setCurrentSubtitle(
           '저는 차크라나 에너지, 믿음의 힘 같은 동화는 믿지 않으니까요. 영혼 같은 건 없어요. 우리는 그저 물질로 이루어졌을 뿐이에요. 당신도 무관심한 우주 속의 작은 먼지일 뿐이죠.'
@@ -146,7 +146,7 @@ export default function Demo() {
     {
       time: 37.23,
       label: 'dialogue-3-backward',
-      direction: 'BACKWARD' as const,
+      direction: MARKER_DIRECTION.BACKWARD,
       callback: () =>
         setCurrentSubtitle(
           '저는 차크라나 에너지, 믿음의 힘 같은 동화는 믿지 않으니까요. 영혼 같은 건 없어요. 우리는 그저 물질로 이루어졌을 뿐이에요. 당신도 무관심한 우주 속의 작은 먼지일 뿐이죠.'
@@ -155,19 +155,19 @@ export default function Demo() {
     {
       time: 37.23,
       label: 'dialogue-4',
-      direction: 'FORWARD' as const,
+      direction: MARKER_DIRECTION.FORWARD,
       callback: () => setCurrentSubtitle('당신은 자신을 너무 과소평가해요.'),
     },
     {
       time: 39.09,
       label: 'dialogue-4-backward',
-      direction: 'BACKWARD' as const,
+      direction: MARKER_DIRECTION.BACKWARD,
       callback: () => setCurrentSubtitle('당신은 자신을 너무 과소평가해요.'),
     },
     {
       time: 39.09,
       label: 'dialogue-5',
-      direction: 'FORWARD' as const,
+      direction: MARKER_DIRECTION.FORWARD,
       callback: () =>
         setCurrentSubtitle(
           '아, 내가 투명인간처럼 보인다고요? 아니에요, 당신은 저를 꿰뚫어보지 못해요. 하지만 저는 당신을 꿰뚫어봤죠.'
@@ -176,7 +176,7 @@ export default function Demo() {
     {
       time: 45.0,
       label: 'dialogue-5-backward',
-      direction: 'BACKWARD' as const,
+      direction: MARKER_DIRECTION.BACKWARD,
       callback: () =>
         setCurrentSubtitle(
           '아, 내가 투명인간처럼 보인다고요? 아니에요, 당신은 저를 꿰뚫어보지 못해요. 하지만 저는 당신을 꿰뚫어봤죠.'
@@ -185,19 +185,19 @@ export default function Demo() {
     {
       time: 45.0,
       label: 'clear',
-      direction: 'FORWARD' as const,
+      direction: MARKER_DIRECTION.FORWARD,
       callback: () => setCurrentSubtitle(''),
     },
     {
       time: 63.04,
       label: 'clear-backward',
-      direction: 'BACKWARD' as const,
+      direction: MARKER_DIRECTION.BACKWARD,
       callback: () => setCurrentSubtitle(''),
     },
     {
       time: 63.04,
       label: 'dialogue-6',
-      direction: 'FORWARD' as const,
+      direction: MARKER_DIRECTION.FORWARD,
       callback: () =>
         setCurrentSubtitle(
           '지금 저한테 무슨 짓을 한 거예요? 당신의 아스트랄 형태를 육체에서 분리시켰어요.'
@@ -206,7 +206,7 @@ export default function Demo() {
     {
       time: 65.12,
       label: 'dialogue-6-backward',
-      direction: 'BACKWARD' as const,
+      direction: MARKER_DIRECTION.BACKWARD,
       callback: () =>
         setCurrentSubtitle(
           '지금 저한테 무슨 짓을 한 거예요? 당신의 아스트랄 형태를 육체에서 분리시켰어요.'
@@ -215,31 +215,31 @@ export default function Demo() {
     {
       time: 65.12,
       label: 'dialogue-7',
-      direction: 'FORWARD' as const,
+      direction: MARKER_DIRECTION.FORWARD,
       callback: () => setCurrentSubtitle('차에 뭐가 들어있죠? 실로시빈? LSD?'),
     },
     {
       time: 66.23,
       label: 'dialogue-7-backward',
-      direction: 'BACKWARD' as const,
+      direction: MARKER_DIRECTION.BACKWARD,
       callback: () => setCurrentSubtitle('차에 뭐가 들어있죠? 실로시빈? LSD?'),
     },
     {
       time: 66.23,
       label: 'dialogue-8',
-      direction: 'FORWARD' as const,
+      direction: MARKER_DIRECTION.FORWARD,
       callback: () => setCurrentSubtitle('그냥 차예요. 꿀을 조금 넣었죠.'),
     },
     {
       time: 75.0,
       label: 'dialogue-8-backward',
-      direction: 'BACKWARD' as const,
+      direction: MARKER_DIRECTION.BACKWARD,
       callback: () => setCurrentSubtitle('그냥 차예요. 꿀을 조금 넣었죠.'),
     },
     {
       time: 75.0,
       label: 'clear',
-      direction: 'FORWARD' as const,
+      direction: MARKER_DIRECTION.FORWARD,
       callback: () => setCurrentSubtitle(''),
     },
   ];

@@ -22,7 +22,18 @@ export type PlayDirection = 'FORWARD' | 'BACKWARD';
 
 export type MarkerDirection = 'FORWARD' | 'BACKWARD' | 'BOTH';
 
+export const MARKER_DIRECTION = {
+  FORWARD: 'FORWARD',
+  BACKWARD: 'BACKWARD',
+  BOTH: 'BOTH',
+} as const;
+
 export type MarkerAction = 'continue' | 'pause';
+
+export const MARKER_ACTION = {
+  CONTINUE: 'continue',
+  PAUSE: 'pause',
+} as const;
 
 export type Marker = {
   videoIndex?: number;
