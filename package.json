@@ -4,6 +4,16 @@
   "version": "0.1.0",
   "type": "module",
   "description": "A React component library for video timestone functionality",
+  "author": "eatdesignlove",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eatdesignlove/react-video-timestone"
+  },
+  "homepage": "https://react-video-timestone.vercel.app",
+  "bugs": {
+    "url": "https://github.com/eatdesignlove/react-video-timestone/issues"
+  },
   "main": "./dist/react-video-timestone.umd.js",
   "module": "./dist/react-video-timestone.es.js",
   "types": "./dist/index.d.ts",
@@ -37,18 +47,18 @@
     "prepublishOnly": "npm run build:lib"
   },
   "dependencies": {
-    "classnames": "^2.5.1",
-    "react": ">=18.0.0",
-    "react-code-blocks": "^0.1.6",
-    "react-dom": ">=18.0.0",
-    "react-icons": "^5.5.0",
-    "vite-plugin-lib-inject-css": "^2.2.2"
+    "classnames": "^2.5.1"
   },
   "peerDependencies": {
     "react": ">=18.0.0",
     "react-dom": ">=18.0.0"
   },
   "devDependencies": {
+    "react": ">=18.0.0",
+    "react-code-blocks": "^0.1.6",
+    "react-dom": ">=18.0.0",
+    "react-icons": "^5.5.0",
+    "vite-plugin-lib-inject-css": "^2.2.2",
     "@eslint/js": "^9.30.1",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
