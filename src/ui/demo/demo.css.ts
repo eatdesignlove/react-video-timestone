@@ -8,8 +8,8 @@ const colors = {
   darkCard: '#161618',
 
   // 그라데이션 컬러
-  gradientPrimary: '#6366f1',
-  gradientSecondary: '#8b5cf6',
+  gradientPrimary: '#f18463',
+  gradientSecondary: '#e2f65c',
   gradientAccent: '#06b6d4',
 
   // 텍스트 컬러
@@ -43,10 +43,16 @@ export const container = style({
   width: '100%',
   height: '0',
   paddingBottom: '56.25%',
+  marginBottom: '120px',
   backgroundColor: colors.dark,
   position: 'relative',
-  overflow: 'hidden',
   borderRadius: '8px',
+  '@media': {
+    '(min-width: 769px)': {
+      overflow: 'hidden',
+      marginBottom: '0',
+    },
+  },
 });
 
 // 히어로 배경 영상
@@ -231,9 +237,7 @@ export const heroLoadingContent = style({
   textAlign: 'center',
   color: colors.textPrimary,
   padding: '30px',
-  background: colors.glass,
   borderRadius: '16px',
-  border: `1px solid ${colors.glassBorder}`,
 });
 
 export const heroProgressBar = style({
@@ -338,7 +342,7 @@ export const hidden = style({
 
 export const controlGroup = style({
   position: 'absolute',
-  top: '50%',
+  top: 'calc(100% + 8px)',
   left: '50%',
   transform: 'translate(-50%, -50%)',
   display: 'flex',
@@ -348,9 +352,17 @@ export const controlGroup = style({
   flexWrap: 'wrap',
   margin: '0 auto',
   zIndex: 200,
+  opacity: 0,
   '@media': {
     '(min-width: 481px)': {
       gap: '12px',
+      top: '50%',
+      transform: 'translate(-50%, -50%)',
+    },
+  },
+  selectors: {
+    '&.active': {
+      opacity: 0.7,
     },
   },
 });
@@ -362,8 +374,8 @@ export const controlButton = style({
   background: '#fff',
   borderRadius: '100%',
   cursor: 'pointer',
-  width: '60px',
-  height: '60px',
+  width: '40px',
+  height: '40px',
   border: 'none',
   '@media': {
     '(min-width: 481px)': {
@@ -544,7 +556,6 @@ export const progressFill = style({
   transition: 'width 0.3s ease',
 });
 
-// 히어로 섹션 프로그래매틱 제어
 export const heroControls = style({
   marginTop: '30px',
   padding: '25px',
@@ -585,6 +596,13 @@ export const progressContainer = style({
   alignItems: 'center',
   color: 'white',
   padding: '0 16px',
+  opacity: 0,
+  transition: 'transform 0.3s ease',
+  selectors: {
+    '&.active': {
+      opacity: 1,
+    },
+  },
   '@media': {
     '(min-width: 481px)': {
       bottom: '30px',
@@ -651,18 +669,20 @@ export const progressMarker = style({
 // 자막 스타일
 export const subtitleContainer = style({
   position: 'absolute',
+  top: 'calc(100% + 40px)',
   left: 0,
   right: 0,
   zIndex: 10,
   display: 'flex',
   justifyContent: 'center',
-  bottom: '80px',
+  // bottom: '80px',
   textAlign: 'center',
   animation: `${fadeInUp} 0.8s ease-out`,
   pointerEvents: 'none',
   padding: '0 20px',
   '@media': {
     '(min-width: 481px)': {
+      top: 'initial',
       bottom: '90px',
     },
   },

@@ -1,7 +1,7 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, forwardRef } from 'react';
 import cx from 'classnames';
 import { IoPauseSharp, IoPlayBackSharp, IoPlaySharp } from 'react-icons/io5';
-import { VideoTimestone, TimelineRef, MARKER_DIRECTION, MARKER_ACTION } from '../../../lib';
+import { VideoTimestone, TimelineRef, MARKER_DIRECTION } from '../../../lib';
 import * as styles from './demo.css';
 
 const PLAY_STATE = {
@@ -10,7 +10,7 @@ const PLAY_STATE = {
   REWIND: 'REWIND',
 } as const;
 
-export default function Demo() {
+const Demo = forwardRef<HTMLElement>((_, ref) => {
   const timelineRef = useRef<TimelineRef>(null);
   const trackRef = useRef<HTMLDivElement>(null); // 추가
   const [playState, setPlayState] = useState<keyof typeof PLAY_STATE>(
@@ -25,6 +25,11 @@ export default function Demo() {
     left: string;
     time: number;
   } | null>(null); // 추가
+
+  // 화면 크기에 따른 비디오 선택 (초기에만)
+  const [videoUrl] = useState(() => {
+    return window.innerWidth < 769 ? '/demo2-mobile.mp4' : '/demo2.mp4';
+  });
 
   const handlePlay = () => {
     timelineRef.current?.play();
@@ -119,7 +124,6 @@ export default function Demo() {
       time: 7.09,
       label: 'dialogue-2',
       direction: MARKER_DIRECTION.FORWARD,
-      action: MARKER_ACTION.PAUSE,
       callback: () =>
         setCurrentSubtitle(
           '당신은 열쇠구멍을 통해 세상을 보는 사람이에요. 평생 그 열쇠구멍을 넓히려 애썼죠. 더 많이 보고, 더 많이 알기 위해서요. 그리고 이제, 그 열쇠구멍이 상상도 못할 방식으로 넓어질 수 있다는 말을 듣고도, 그 가능성을 거부하네요.'
@@ -258,7 +262,7 @@ export default function Demo() {
   // container 위에서 마우스 움직였을 때 controlContainer 표시되었다가, 5초이상 움직임 없으면 숨기기
 
   return (
-    <section className={styles.container}>
+    <section ref={ref} id="demo-section" className={styles.container}>
       <div className={styles.heroVideoBackground}>
         {!isLoaded && (
           <div className={styles.heroLoadingOverlay}>
@@ -276,7 +280,7 @@ export default function Demo() {
         <VideoTimestone
           ref={timelineRef}
           className={styles.heroBackgroundVideo}
-          videoUrls={['/demo2.mp4']}
+          videoUrls={[videoUrl]}
           markers={subtitleMarkers}
           onLoading={progress => setLoadingProgress(progress)}
           onLoaded={() => setIsLoaded(true)}
@@ -301,7 +305,7 @@ export default function Demo() {
           }}
         />
       </div>
-      <div className={styles.controlGroup}>
+      <div className={cx(styles.controlGroup, isLoaded && 'active')}>
         <button
           title="Rewind"
           className={cx(
@@ -336,7 +340,7 @@ export default function Demo() {
           <IoPlaySharp size={16} />
         </button>
       </div>
-      <div className={styles.progressContainer}>
+      <div className={cx(styles.progressContainer, isLoaded && 'active')}>
         <div className={styles.progressTime}>{formatTime(currentTime)}</div>
         <div
           ref={trackRef}
@@ -396,4 +400,6 @@ export default function Demo() {
       )}
     </section>
   );
-}
+});
+
+export default Demo;

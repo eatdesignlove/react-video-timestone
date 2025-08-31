@@ -54,7 +54,7 @@ export default function Features() {
         </div>
         <div className={cx(styles.featureItem, 'item-3')}>
           <div>
-            <FeatureIcon3 />
+            <FeatureIcon3 width="100%" />
           </div>
           <div className={styles.featureContent}>
             <h2 className={styles.featureTitle}>
