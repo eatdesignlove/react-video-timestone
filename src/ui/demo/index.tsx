@@ -50,6 +50,7 @@ const Demo = forwardRef<HTMLElement>((_, ref) => {
         playState === PLAY_STATE.PLAY || playState === PLAY_STATE.REWIND,
     });
     setCurrentTime(timelineRef.current?.videoElement?.currentTime || 0);
+    setCurrentSubtitle('');
   };
 
   // 트랙에서 마우스 이벤트 처리 (추가)
