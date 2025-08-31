@@ -22,11 +22,13 @@ export type PlayDirection = 'FORWARD' | 'BACKWARD';
 
 export type MarkerDirection = 'FORWARD' | 'BACKWARD' | 'BOTH';
 
+export type MarkerAction = 'continue' | 'pause';
+
 export type Marker = {
   videoIndex?: number;
   label: string;
   time: number;
-  type?: 'pause';
+  action?: MarkerAction;
   direction?: MarkerDirection;
   callback?: () => void;
   triggerPause?: () => void;

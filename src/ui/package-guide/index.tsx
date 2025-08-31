@@ -213,7 +213,7 @@ interface Marker {
   videoIndex?: number;           // Video index (default: 0)
   label: string;                 // Marker identifier
   time: number;                  // Time in seconds
-  type?: 'pause';               // Auto-pause at marker
+  action?: 'continue' | 'pause'; // Marker action (default: 'continue')
   direction?: 'FORWARD' | 'BACKWARD' | 'BOTH'; // Playback direction filter
   callback?: () => void;         // Callback function
 }`}

@@ -94,7 +94,7 @@ export default function Demo() {
     {
       time: 1.03,
       label: 'clear',
-      direction: 'BOTH' as const,
+      direction: 'BACKWARD' as const,
       callback: () => setCurrentSubtitle(''),
     },
     {
@@ -119,6 +119,7 @@ export default function Demo() {
       time: 7.09,
       label: 'dialogue-2',
       direction: 'FORWARD' as const,
+      action: 'pause',
       callback: () =>
         setCurrentSubtitle(
           '당신은 열쇠구멍을 통해 세상을 보는 사람이에요. 평생 그 열쇠구멍을 넓히려 애썼죠. 더 많이 보고, 더 많이 알기 위해서요. 그리고 이제, 그 열쇠구멍이 상상도 못할 방식으로 넓어질 수 있다는 말을 듣고도, 그 가능성을 거부하네요.'
