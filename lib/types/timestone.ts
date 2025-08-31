@@ -28,11 +28,11 @@ export const MARKER_DIRECTION = {
   BOTH: 'BOTH',
 } as const;
 
-export type MarkerAction = 'continue' | 'pause';
+export type MarkerAction = 'CONTINUE' | 'PAUSE';
 
 export const MARKER_ACTION = {
-  CONTINUE: 'continue',
-  PAUSE: 'pause',
+  CONTINUE: 'CONTINUE',
+  PAUSE: 'PAUSE',
 } as const;
 
 export type Marker = {

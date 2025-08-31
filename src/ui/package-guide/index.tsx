@@ -200,8 +200,8 @@ export const MARKER_DIRECTION = {
 } as const;
 
 export const MARKER_ACTION = {
-  CONTINUE: 'continue',
-  PAUSE: 'pause',
+  CONTINUE: 'CONTINUE',
+  PAUSE: 'PAUSE',
 } as const;
 
 type MarkerDirection = typeof MARKER_DIRECTION[keyof typeof MARKER_DIRECTION];
@@ -227,7 +227,7 @@ interface Marker {
   videoIndex?: number;           // Video index (default: 0)
   label: string;                 // Marker label
   time: number;                  // Time in seconds
-  action?: MarkerAction;         // Marker action (default: 'continue')
+  action?: MarkerAction;         // Marker action (default: 'CONTINUE')
   direction?: MarkerDirection;   // Playback direction filter
   callback?: () => void;         // Callback function
 }`}

@@ -91,7 +91,7 @@ export const useVideoAnimation = ({
       }
 
       if (currentMarkerName.current !== marker.label) {
-        if (marker.action === 'pause') {
+        if (marker.action === 'PAUSE') {
           marker.triggerPause?.();
           clear();
         }

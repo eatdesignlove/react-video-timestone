@@ -201,8 +201,8 @@ export const MARKER_DIRECTION = {
 } as const;
 
 export const MARKER_ACTION = {
-  CONTINUE: 'continue',
-  PAUSE: 'pause',
+  CONTINUE: 'CONTINUE',
+  PAUSE: 'PAUSE',
 } as const;
 
 // Marker types
@@ -213,7 +213,7 @@ type Marker = {
   videoIndex?: number; // Video index (default: 0)
   label: string; // Marker label
   time: number; // Marker time (seconds)
-  action?: MarkerAction; // Marker action (default: 'continue')
+  action?: MarkerAction; // Marker action (default: 'CONTINUE')
   direction?: MarkerDirection; // Direction
   callback?: () => void; // Callback function
 };

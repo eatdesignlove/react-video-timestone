@@ -201,8 +201,8 @@ export const MARKER_DIRECTION = {
 } as const;
 
 export const MARKER_ACTION = {
-  CONTINUE: 'continue',
-  PAUSE: 'pause',
+  CONTINUE: 'CONTINUE',
+  PAUSE: 'PAUSE',
 } as const;
 
 // 마커 타입
@@ -213,7 +213,7 @@ type Marker = {
   videoIndex?: number; // 비디오 인덱스 (기본값: 0)
   label: string; // 마커 라벨
   time: number; // 마커 시간 (초)
-  action?: MarkerAction; // 마커 액션 (기본값: 'continue')
+  action?: MarkerAction; // 마커 액션 (기본값: 'CONTINUE')
   direction?: MarkerDirection; // 방향
   callback?: () => void; // 콜백 함수
 };
