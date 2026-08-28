@@ -47,6 +47,7 @@
     "prepublishOnly": "npm run build:lib"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "classnames": "^2.5.1"
   },
   "peerDependencies": {

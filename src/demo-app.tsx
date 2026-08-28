@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { Features, Footer, Header, Hero, PackageGuide } from './ui';
 import * as styles from './demo-app.css';
 
@@ -18,6 +19,7 @@ function DemoApp() {
       <Features />
       <PackageGuide />
       <Footer />
+      <Analytics />
     </div>
   );
 }
