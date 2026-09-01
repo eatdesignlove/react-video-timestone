@@ -13,7 +13,7 @@ export default function Hero({ onGetStarted, demoSectionRef }: HeroProps) {
       <div className={styles.content}>
         <h1 className={styles.title}>
           Master Time, <br />
-          Just Like Doctor Strange
+          <span className={styles.titleAccent}>Just Like Doctor Strange</span>
         </h1>
         <p className={styles.description}>
           Shape time. Design moments.
@@ -24,7 +24,9 @@ export default function Hero({ onGetStarted, demoSectionRef }: HeroProps) {
         </button>
       </div>
       <div className={styles.demoContainer}>
-        <Demo ref={demoSectionRef} />
+        <div className={styles.demoFrame}>
+          <Demo ref={demoSectionRef} />
+        </div>
       </div>
     </section>
   );

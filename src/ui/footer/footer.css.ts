@@ -1,14 +1,16 @@
 import { style } from '@vanilla-extract/css';
+import { vars } from '../../theme.css';
 
 export const container = style({
-  marginTop: '120px',
-  borderTop: '1px solid rgba(255, 255, 255, 0.2)',
+  marginTop: vars.space[9],
+  borderTop: `1px solid ${vars.color.border}`,
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  padding: '28px 0 80px',
-  fontFamily: 'Inter',
-  fontSize: '16px',
-  lineHeight: '1.4',
-  color: 'rgba(255, 255, 255, 0.8)',
+  padding: `${vars.space[6]} ${vars.space[5]} ${vars.space[8]}`,
+  fontFamily: vars.font.sans,
+  fontSize: '13px',
+  lineHeight: 1.6,
+  color: vars.color.textFaint,
+  textAlign: 'center',
 });

@@ -1,13 +1,34 @@
+import { useEffect, useRef, useState } from 'react';
 import cx from 'classnames';
-
-import FeatureIcon1 from '../../../public/feature-1.svg?react';
-import FeatureIcon2 from '../../../public/feature-2.svg?react';
-import FeatureIcon3 from '../../../public/feature-3.svg?react';
-import FeatureIcon4 from '../../../public/feature-4.svg?react';
-
+import {
+  MarkerIllustration,
+  PreloadIllustration,
+  ReverseIllustration,
+  TimelineIllustration,
+} from './illustrations';
 import * as styles from './features.css';
 
 export default function Features() {
+  const gridRef = useRef<HTMLDivElement>(null);
+  const [revealed, setRevealed] = useState(false);
+
+  useEffect(() => {
+    const grid = gridRef.current;
+    if (!grid) return;
+
+    const observer = new IntersectionObserver(
+      entries => {
+        if (!entries[0]?.isIntersecting) return;
+        setRevealed(true);
+        observer.disconnect();
+      },
+      { rootMargin: '0px 0px -12% 0px', threshold: 0.12 }
+    );
+
+    observer.observe(grid);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <section className={styles.container}>
       <div className={styles.sectionHeader}>
@@ -21,8 +42,12 @@ export default function Features() {
           reverse, and skip.
         </p>
       </div>
-      <div className={styles.sectionContent}>
-        <div className={cx(styles.featureItem, 'item-1')}>
+      <div
+        ref={gridRef}
+        className={styles.sectionContent}
+        data-revealed={revealed}
+      >
+        <article className={cx(styles.featureItem, 'item-1')}>
           <div className={styles.featureContent}>
             <h2 className={styles.featureTitle}>
               Preload-Based,
@@ -34,11 +59,11 @@ export default function Features() {
               all videos using Blob URLs, eliminating buffering interruptions.
             </p>
           </div>
-          <div>
-            <FeatureIcon1 />
+          <div className={styles.illustration}>
+            <PreloadIllustration className={styles.illustrationSvg} />
           </div>
-        </div>
-        <div className={cx(styles.featureItem, 'item-2')}>
+        </article>
+        <article className={cx(styles.featureItem, 'item-2')}>
           <div className={styles.featureContent}>
             <h2 className={styles.featureTitle}>
               Reverse Playback <br /> Handling
@@ -48,13 +73,13 @@ export default function Features() {
               overcoming the limitations of HTML5 video’s built-in support.
             </p>
           </div>
-          <div>
-            <FeatureIcon2 />
+          <div className={styles.illustration}>
+            <ReverseIllustration className={styles.illustrationSvg} />
           </div>
-        </div>
-        <div className={cx(styles.featureItem, 'item-3')}>
-          <div>
-            <FeatureIcon3 width="100%" />
+        </article>
+        <article className={cx(styles.featureItem, 'item-3')}>
+          <div className={styles.illustration}>
+            <MarkerIllustration className={styles.markerSvg} />
           </div>
           <div className={styles.featureContent}>
             <h2 className={styles.featureTitle}>
@@ -67,8 +92,8 @@ export default function Features() {
               declarative API, without the need for complex timing logic.
             </p>
           </div>
-        </div>
-        <div className={cx(styles.featureItem, 'item-4')}>
+        </article>
+        <article className={cx(styles.featureItem, 'item-4')}>
           <div className={styles.featureContent}>
             <h2 className={styles.featureTitle}>
               Multi-Video
@@ -80,10 +105,10 @@ export default function Features() {
               seamless, interruption-free transitions.
             </p>
           </div>
-          <div>
-            <FeatureIcon4 />
+          <div className={styles.illustration}>
+            <TimelineIllustration className={styles.illustrationSvg} />
           </div>
-        </div>
+        </article>
       </div>
     </section>
   );

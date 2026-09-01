@@ -1,14 +1,116 @@
-import { CopyBlock, dracula } from 'react-code-blocks';
+import { useState, type ReactNode } from 'react';
 import * as styles from './package-guide.css';
 
-const codeBlockProps = {
-  showLineNumbers: true,
-  codeBlock: true,
-  theme: dracula,
-  codeContainerStyle: {
-    fontFamily: 'monospace',
-  },
+const LANGUAGE_LABELS: Record<string, string> = {
+  bash: 'Bash',
+  tsx: 'TSX',
+  typescript: 'TypeScript',
 };
+
+const TOKEN_PATTERN =
+  /(\/\/.*$|#.*$|'(?:\\.|[^'\\])*'|"(?:\\.|[^"\\])*"|`(?:\\.|[^`\\])*`|\b(?:as|const|export|from|function|import|interface|return|type|typeof|new|if|else|true|false|undefined)\b|\b\d+(?:\.\d+)?\b)/gm;
+
+function highlightLine(line: string): ReactNode[] {
+  return line.split(TOKEN_PATTERN).map((token, index) => {
+    if (!token) return null;
+
+    let className: string | undefined;
+    if (/^(\/\/|#)/.test(token)) className = styles.tokenComment;
+    else if (/^['"`]/.test(token)) className = styles.tokenString;
+    else if (/^\d/.test(token)) className = styles.tokenNumber;
+    else if (/^(true|false|undefined)$/.test(token))
+      className = styles.tokenLiteral;
+    else if (/^[a-z]+$/.test(token)) className = styles.tokenKeyword;
+
+    return className ? (
+      <span className={className} key={`${token}-${index}`}>
+        {token}
+      </span>
+    ) : (
+      token
+    );
+  });
+}
+
+interface CodeSampleProps {
+  language: string;
+  text: string;
+}
+
+function CodeSample({ language, text }: CodeSampleProps) {
+  const [copied, setCopied] = useState(false);
+
+  const copyCode = async () => {
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1600);
+  };
+
+  return (
+    <div className={styles.codeCard}>
+      <div className={styles.codeHeader}>
+        <span className={styles.codeLanguage}>
+          {LANGUAGE_LABELS[language] ?? language}
+        </span>
+        <button
+          type="button"
+          className={styles.copyButton}
+          onClick={copyCode}
+          aria-label={copied ? 'Code copied' : 'Copy code'}
+        >
+          {copied ? (
+            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+              <path
+                d="m3 8 3 3 7-7"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          ) : (
+            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+              <rect
+                x="5.5"
+                y="5.5"
+                width="7"
+                height="7"
+                rx="1.2"
+                fill="none"
+                stroke="currentColor"
+              />
+              <path
+                d="M3.5 10.5h-1v-7a1 1 0 0 1 1-1h7v1"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+              />
+            </svg>
+          )}
+          <span aria-live="polite">{copied ? 'Copied' : 'Copy'}</span>
+        </button>
+      </div>
+      <div className={styles.codeScroller} tabIndex={0}>
+        <pre className={styles.codeBlock}>
+          <code>
+            {text.split('\n').map((line, index) => (
+              <span className={styles.codeLine} key={index}>
+                <span className={styles.lineNumber} aria-hidden="true">
+                  {index + 1}
+                </span>
+                <span className={styles.lineContent}>
+                  {highlightLine(line)}
+                  {'\n'}
+                </span>
+              </span>
+            ))}
+          </code>
+        </pre>
+      </div>
+    </div>
+  );
+}
 
 export default function PackageGuide() {
   return (
@@ -17,22 +119,20 @@ export default function PackageGuide() {
         <h1 className={styles.title}>Get Started</h1>
         <div className={styles.contentWrapper}>
           <h2 className={styles.subTitle}>Installation</h2>
-          <CopyBlock
-            {...codeBlockProps}
+          <CodeSample
             language="bash"
             text={'npm install react-video-timestone'}
           />
         </div>
         <div className={styles.contentWrapper}>
           <h2 className={styles.subTitle}>Prepare Video (GOP 1)</h2>
-          <CopyBlock
+          <CodeSample
             language="bash"
             text={`# Basic GOP-1 conversion
 ffmpeg -i input.mp4 -g 1 output-gop1.mp4
 
 # With quality adjustment if needed
 ffmpeg -i input.mp4 -g 1 -c:v libx264 -crf 23 output-gop1.mp4`}
-            {...codeBlockProps}
           />
         </div>
       </section>
@@ -40,7 +140,7 @@ ffmpeg -i input.mp4 -g 1 -c:v libx264 -crf 23 output-gop1.mp4`}
         <h1 className={styles.title}>Usage</h1>
         <div className={styles.contentWrapper}>
           <h2 className={styles.subTitle}>Basic</h2>
-          <CopyBlock
+          <CodeSample
             language="tsx"
             text={`import { VideoTimestone } from 'react-video-timestone';
 
@@ -53,12 +153,11 @@ function App() {
     />
   );
 }`}
-            {...codeBlockProps}
           />
         </div>
         <div className={styles.contentWrapper}>
           <h2 className={styles.subTitle}>Loading</h2>
-          <CopyBlock
+          <CodeSample
             language="tsx"
             text={`import { VideoTimestone } from 'react-video-timestone';
 
@@ -77,12 +176,11 @@ function App() {
     </div>
   );
 }`}
-            {...codeBlockProps}
           />
         </div>
         <div className={styles.contentWrapper}>
           <h2 className={styles.subTitle}>Add Marker</h2>
-          <CopyBlock
+          <CodeSample
             language="tsx"
             text={`import { VideoTimestone, MARKER_ACTION } from 'react-video-timestone';
 
@@ -111,12 +209,11 @@ function App() {
     />
   );
 }`}
-            {...codeBlockProps}
           />
         </div>
         <div className={styles.contentWrapper}>
           <h2 className={styles.subTitle}>Control Playback</h2>
-          <CopyBlock
+          <CodeSample
             language="tsx"
             text={`import { VideoTimestone } from 'react-video-timestone';
 import { useRef } from 'react';
@@ -143,12 +240,11 @@ function App() {
     </div>
   );
 }`}
-            {...codeBlockProps}
           />
         </div>
         <div className={styles.contentWrapper}>
           <h2 className={styles.subTitle}>Marker Directions</h2>
-          <CopyBlock
+          <CodeSample
             language="tsx"
             text={`import { VideoTimestone, MARKER_DIRECTION } from 'react-video-timestone';
 
@@ -182,7 +278,6 @@ function App() {
     />
   );
 }`}
-            {...codeBlockProps}
           />
         </div>
       </section>
@@ -190,7 +285,7 @@ function App() {
         <h1 className={styles.title}>API</h1>
         <div className={styles.contentWrapper}>
           <h2 className={styles.subTitle}>Props</h2>
-          <CopyBlock
+          <CodeSample
             language="typescript"
             text={`// Constants for better developer experience
 export const MARKER_DIRECTION = {
@@ -231,7 +326,6 @@ interface Marker {
   direction?: MarkerDirection;   // Playback direction filter
   callback?: () => void;         // Callback function
 }`}
-            {...codeBlockProps}
           />
         </div>
       </section>
