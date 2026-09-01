@@ -1,6 +1,12 @@
 import { useRef, useState, useEffect, forwardRef } from 'react';
 import cx from 'classnames';
-import { IoPauseSharp, IoPlayBackSharp, IoPlaySharp } from 'react-icons/io5';
+import {
+  IoPauseSharp,
+  IoPlayBackSharp,
+  IoPlaySharp,
+  IoPlaySkipBackSharp,
+  IoPlaySkipForwardSharp,
+} from 'react-icons/io5';
 import {
   VideoTimestone,
   TimelineRef,
@@ -15,11 +21,21 @@ const PLAY_STATE = {
   REWIND: 'REWIND',
 } as const;
 
+type PlayState = keyof typeof PLAY_STATE;
+
+const SEGMENT_BOUNDARY_EPSILON = 0.01;
+const REWIND_START_EPSILON = 0.05;
+const PREVIOUS_RESTART_THRESHOLD = 0.25;
+const END_BOUNDARY_TOLERANCE = 0.25;
+
 const Demo = forwardRef<HTMLElement>((_, ref) => {
   const timelineRef = useRef<TimelineRef>(null);
   const trackRef = useRef<HTMLDivElement>(null); // 추가
+  const playbackIntentRef = useRef<PlayState>(PLAY_STATE.PAUSE);
+  const hasEnteredPlaybackRef = useRef(false);
+  // 실제로 재생 중인 상태가 아니므로 PAUSE로 시작 (가짜 PLAY 상태 방지)
   const [playState, setPlayState] = useState<keyof typeof PLAY_STATE>(
-    PLAY_STATE.PLAY
+    PLAY_STATE.PAUSE
   );
   const [videoDuration, setVideoDuration] = useState<number>(0);
   const [currentTime, setCurrentTime] = useState<number>(0);
@@ -31,30 +47,66 @@ const Demo = forwardRef<HTMLElement>((_, ref) => {
     time: number;
   } | null>(null); // 추가
 
-  // 화면 크기에 따른 비디오 선택 (초기에만)
-  const [videoUrl] = useState(() => {
-    return window.innerWidth < 769 ? '/demo2-mobile.mp4' : '/demo2.mp4';
-  });
+  // 사용자가 데모를 요청하기 전까지 VideoTimestone을 마운트하지 않는다.
+  const [started, setStarted] = useState(false);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+
+  const handleStart = () => {
+    setVideoUrl(
+      window.matchMedia('(min-width: 769px)').matches
+        ? '/demo2-desktop.mp4'
+        : '/demo2-mobile-8bit.mp4'
+    );
+    setStarted(true);
+  };
 
   const handlePlay = () => {
+    playbackIntentRef.current = PLAY_STATE.PLAY;
+    hasEnteredPlaybackRef.current = true;
+    setPlayState(PLAY_STATE.PLAY);
     timelineRef.current?.play();
   };
 
   const handlePause = () => {
+    playbackIntentRef.current = PLAY_STATE.PAUSE;
+    setPlayState(PLAY_STATE.PAUSE);
     timelineRef.current?.pause();
   };
 
+  const isRewinding = playState === PLAY_STATE.REWIND;
+  const isMoving = playState !== PLAY_STATE.PAUSE;
+
   const handleRewind = () => {
+    if (playbackIntentRef.current === PLAY_STATE.REWIND) {
+      handlePause();
+      return;
+    }
+
+    if (currentTime <= REWIND_START_EPSILON) return;
+
+    // Direction changes do not always trigger onStateChange while already playing,
+    // so user intent remains authoritative until the engine actually pauses/stops.
+    playbackIntentRef.current = PLAY_STATE.REWIND;
+    setPlayState(PLAY_STATE.REWIND);
+
+    // The library's READY reducer ignores its first REVERSE action even though
+    // the animation direction ref flips. Queue PLAYING -> PAUSED first so both
+    // internal direction stores enter rewind in sync, without changing its API.
+    if (!hasEnteredPlaybackRef.current) {
+      timelineRef.current?.play();
+      timelineRef.current?.pause();
+      hasEnteredPlaybackRef.current = true;
+    }
+
     timelineRef.current?.rewind();
   };
 
   const handleSeekTo = (time: number) => {
     timelineRef.current?.seekTo({
       time,
-      autoPlay:
-        playState === PLAY_STATE.PLAY || playState === PLAY_STATE.REWIND,
+      autoPlay: isMoving,
     });
-    setCurrentTime(timelineRef.current?.videoElement?.currentTime || 0);
+    setCurrentTime(time);
     setCurrentSubtitle('');
   };
 
@@ -255,12 +307,64 @@ const Demo = forwardRef<HTMLElement>((_, ref) => {
     },
   ];
 
+  const segmentTimes = Array.from(
+    new Set(subtitleMarkers.map(marker => marker.time))
+  ).sort((a, b) => a - b);
+
+  const currentSegmentIndex = segmentTimes.reduce(
+    (lastIndex, time, index) =>
+      time <= currentTime + SEGMENT_BOUNDARY_EPSILON ? index : lastIndex,
+    -1
+  );
+  const currentSegmentTime = segmentTimes[currentSegmentIndex];
+  const previousSegmentTime =
+    currentSegmentTime !== undefined &&
+    currentTime - currentSegmentTime > PREVIOUS_RESTART_THRESHOLD
+      ? currentSegmentTime
+      : segmentTimes[currentSegmentIndex - 1];
+  const nextSegmentTime = segmentTimes.find(
+    time =>
+      time > currentTime + SEGMENT_BOUNDARY_EPSILON &&
+      (!videoDuration || time <= videoDuration + END_BOUNDARY_TOLERANCE)
+  );
+  const lastSegmentTime = segmentTimes[segmentTimes.length - 1] ?? 0;
+  const isNearLastSegment =
+    currentTime >= lastSegmentTime - END_BOUNDARY_TOLERANCE;
+  const isNearVideoEnd =
+    videoDuration > 0 && currentTime >= videoDuration - END_BOUNDARY_TOLERANCE;
+  const canGoPrevious = isLoaded && previousSegmentTime !== undefined;
+  const canRewind = isLoaded && currentTime > REWIND_START_EPSILON;
+  const canGoNext =
+    isLoaded &&
+    nextSegmentTime !== undefined &&
+    !isNearLastSegment &&
+    !isNearVideoEnd;
+
+  const handlePreviousSegment = () => {
+    if (previousSegmentTime !== undefined) {
+      handleSeekTo(previousSegmentTime);
+    }
+  };
+
+  const handleNextSegment = () => {
+    if (nextSegmentTime !== undefined) {
+      handleSeekTo(nextSegmentTime);
+    }
+  };
+
   // 현재 재생 시간 추적
   useEffect(() => {
     if (playState === PLAY_STATE.PAUSE || !videoDuration) return;
 
     const interval = setInterval(() => {
-      setCurrentTime(timelineRef.current?.videoElement?.currentTime || 0);
+      const nextTime = timelineRef.current?.videoElement?.currentTime || 0;
+      setCurrentTime(nextTime);
+
+      if (playState === PLAY_STATE.REWIND && nextTime <= REWIND_START_EPSILON) {
+        playbackIntentRef.current = PLAY_STATE.PAUSE;
+        timelineRef.current?.pause();
+        setPlayState(PLAY_STATE.PAUSE);
+      }
     }, 100); // 100ms마다 업데이트
 
     return () => clearInterval(interval);
@@ -270,137 +374,213 @@ const Demo = forwardRef<HTMLElement>((_, ref) => {
 
   return (
     <section ref={ref} id="demo-section" className={styles.container}>
-      <div className={styles.heroVideoBackground}>
-        {!isLoaded && (
-          <div className={styles.heroLoadingOverlay}>
-            <div className={styles.heroLoadingContent}>
-              <div className={styles.heroProgressBar}>
-                <div
-                  className={styles.heroProgressFill}
-                  style={{ width: `${loadingProgress}%` }}
-                />
-              </div>
-              <span>영상 로딩 중... {Math.round(loadingProgress)}%</span>
-            </div>
+      <div className={styles.stage}>
+        {!started && (
+          <div className={styles.startOverlay}>
+            <img
+              src="/demo2-poster.jpg"
+              alt="React Video Timestone 인터랙티브 데모 미리보기"
+              className={styles.posterImage}
+            />
+            <div className={styles.startScrim} />
+            <button
+              type="button"
+              className={styles.startButton}
+              onClick={handleStart}
+            >
+              <IoPlaySharp size={18} aria-hidden />
+              View Interactive Demo
+            </button>
           </div>
         )}
-        <VideoTimestone
-          ref={timelineRef}
-          className={styles.heroBackgroundVideo}
-          videoUrls={[videoUrl]}
-          markers={subtitleMarkers}
-          onLoading={progress => setLoadingProgress(progress)}
-          onLoaded={() => setIsLoaded(true)}
-          onStateChange={({ isPlaying, isRewind }) => {
-            setPlayState(
-              isPlaying
-                ? isRewind
-                  ? PLAY_STATE.REWIND
-                  : PLAY_STATE.PLAY
-                : PLAY_STATE.PAUSE
-            );
-          }}
-          onReady={() => {
-            setTimeout(() => {
-              const videoElement = document.querySelector('video');
-              if (videoElement && videoElement.duration) {
-                setVideoDuration(videoElement.duration);
-              }
-            }, 500);
-          }}
-        />
-      </div>
-      <div className={cx(styles.controlGroup, isLoaded && 'active')}>
-        <button
-          title="Rewind"
-          className={cx(
-            styles.controlButton,
-            playState === PLAY_STATE.REWIND && 'active'
-          )}
-          onClick={handleRewind}
-          disabled={playState === PLAY_STATE.REWIND}
-        >
-          <IoPlayBackSharp size={16} />
-        </button>
-        <button
-          title="Pause"
-          className={cx(
-            styles.controlButton,
-            playState === PLAY_STATE.PAUSE && 'active'
-          )}
-          onClick={handlePause}
-          disabled={playState === PLAY_STATE.PAUSE}
-        >
-          <IoPauseSharp size={16} />
-        </button>
-        <button
-          title="Play"
-          className={cx(
-            styles.controlButton,
-            playState === PLAY_STATE.PLAY && 'active'
-          )}
-          onClick={handlePlay}
-          disabled={playState === PLAY_STATE.PLAY}
-        >
-          <IoPlaySharp size={16} />
-        </button>
-      </div>
-      <div className={cx(styles.progressContainer, isLoaded && 'active')}>
-        <div className={styles.progressTime}>{formatTime(currentTime)}</div>
-        <div
-          ref={trackRef}
-          className={styles.progressTrack}
-          onMouseMove={handleTrackMouseMove}
-          onMouseLeave={handleTrackMouseLeave}
-          onClick={handleTrackClick}
-          style={{ cursor: 'pointer' }}
-        >
-          {/* 현재 재생 위치 표시 */}
-          <div
-            className={styles.progressPlaybackFill}
-            style={{
-              width: videoDuration
-                ? `${(currentTime / videoDuration) * 100}%`
-                : '0%',
-            }}
-          />
+        {started && (
+          <div className={styles.heroVideoBackground}>
+            {!isLoaded && (
+              <div className={styles.heroLoadingOverlay}>
+                <div
+                  className={styles.heroLoadingContent}
+                  role="status"
+                  aria-live="polite"
+                >
+                  <div className={styles.heroProgressBar}>
+                    <div
+                      className={styles.heroProgressFill}
+                      style={{ width: `${loadingProgress}%` }}
+                    />
+                  </div>
+                  <span>Loading video… {Math.round(loadingProgress)}%</span>
+                </div>
+              </div>
+            )}
+            <VideoTimestone
+              ref={timelineRef}
+              className={styles.heroBackgroundVideo}
+              videoUrls={[videoUrl!]}
+              markers={subtitleMarkers}
+              onLoading={progress => setLoadingProgress(progress)}
+              onLoaded={() => setIsLoaded(true)}
+              onStateChange={({ isPlaying }) => {
+                const playbackIntent = playbackIntentRef.current;
 
-          {mousePosition && (
-            <div
-              className={styles.progressMarker}
-              style={{
-                left: mousePosition.left,
-                transform: 'translate(-50%, -50%)',
+                if (!isPlaying) {
+                  const stoppedTime =
+                    timelineRef.current?.videoElement?.currentTime;
+
+                  playbackIntentRef.current = PLAY_STATE.PAUSE;
+                  if (stoppedTime !== undefined) {
+                    setCurrentTime(
+                      stoppedTime <= REWIND_START_EPSILON ? 0 : stoppedTime
+                    );
+                  }
+                  setPlayState(PLAY_STATE.PAUSE);
+                  return;
+                }
+
+                if (playbackIntent === PLAY_STATE.PAUSE) {
+                  return;
+                }
+
+                if (playbackIntent === PLAY_STATE.REWIND) {
+                  setPlayState(PLAY_STATE.REWIND);
+                  return;
+                }
+
+                // A direction-only reducer update can report the old direction.
+                // Explicit forward intent stays authoritative while moving.
+                setPlayState(PLAY_STATE.PLAY);
               }}
-              title={`${formatTime(mousePosition.time)}`}
-            >
-              {formatTime(mousePosition.time)}
+              onReady={() => {
+                setTimeout(() => {
+                  const videoElement = document.querySelector('video');
+                  if (videoElement && videoElement.duration) {
+                    setVideoDuration(videoElement.duration);
+                  }
+                }, 500);
+              }}
+            />
+          </div>
+        )}
+      </div>
+      {started && (
+        <div className={styles.controlTray}>
+          {currentSubtitle && (
+            <div className={styles.subtitleContainer}>
+              <p className={styles.subtitleText}>{currentSubtitle}</p>
             </div>
           )}
-
-          {/* 자막 마커들 표시 */}
-          {subtitleMarkers
-            .filter(marker => marker.time > 0 && marker.time < videoDuration)
-            .map((marker, index) => (
+          <div className={cx(styles.progressContainer, isLoaded && 'active')}>
+            <div className={styles.progressTime}>{formatTime(currentTime)}</div>
+            <div
+              ref={trackRef}
+              className={styles.progressTrack}
+              onMouseMove={handleTrackMouseMove}
+              onMouseLeave={handleTrackMouseLeave}
+              onClick={handleTrackClick}
+              style={{ cursor: 'pointer' }}
+            >
+              {/* 현재 재생 위치 표시 */}
               <div
-                key={`subtitle-marker-${index}`}
-                className={styles.subtitleMarker}
+                className={styles.progressPlaybackFill}
                 style={{
-                  left: `${(marker.time / videoDuration) * 100}%`,
+                  width: videoDuration
+                    ? `${(currentTime / videoDuration) * 100}%`
+                    : '0%',
                 }}
-                title={`자막 ${index + 1}: ${formatTime(marker.time)}`}
+              />
+
+              {mousePosition && (
+                <div
+                  className={styles.progressMarker}
+                  style={{
+                    left: mousePosition.left,
+                    transform: 'translate(-50%, -50%)',
+                  }}
+                  title={`${formatTime(mousePosition.time)}`}
+                >
+                  {formatTime(mousePosition.time)}
+                </div>
+              )}
+
+              {/* 자막 마커들 표시 */}
+              {subtitleMarkers
+                .filter(
+                  marker => marker.time > 0 && marker.time < videoDuration
+                )
+                .map((marker, index) => (
+                  <div
+                    key={`subtitle-marker-${index}`}
+                    className={styles.subtitleMarker}
+                    style={{
+                      left: `${(marker.time / videoDuration) * 100}%`,
+                    }}
+                    title={`자막 ${index + 1}: ${formatTime(marker.time)}`}
+                  >
+                    <span className={styles.subtitleMarkerText}>
+                      {marker?.label}
+                    </span>
+                  </div>
+                ))}
+            </div>
+            <div className={styles.progressTime}>
+              {formatTime(videoDuration)}
+            </div>
+          </div>
+          <div className={cx(styles.controlGroup, isLoaded && 'active')}>
+            <div className={styles.rewindControl}>
+              <button
+                type="button"
+                title={isRewinding ? 'Stop rewind' : 'Rewind'}
+                aria-label={isRewinding ? 'Stop rewind' : 'Rewind'}
+                aria-pressed={isRewinding}
+                className={styles.rewindButton}
+                onClick={handleRewind}
+                disabled={!canRewind}
               >
-                <span className={styles.subtitleMarkerText}>
-                  {marker?.label}
-                </span>
-              </div>
-            ))}
-        </div>
-        <div className={styles.progressTime}>{formatTime(videoDuration)}</div>
-      </div>
-      {currentSubtitle && (
-        <div className={styles.subtitleContainer}>
-          <p className={styles.subtitleText}>{currentSubtitle}</p>
+                <IoPlayBackSharp size={16} aria-hidden />
+              </button>
+            </div>
+            <div
+              className={styles.segmentControls}
+              role="group"
+              aria-label="Segment playback controls"
+            >
+              <button
+                type="button"
+                title="Previous segment"
+                aria-label="Previous segment"
+                className={styles.segmentButton}
+                onClick={handlePreviousSegment}
+                disabled={!canGoPrevious}
+              >
+                <IoPlaySkipBackSharp size={18} aria-hidden />
+              </button>
+              <button
+                type="button"
+                title={isMoving ? 'Pause' : 'Play'}
+                aria-label={isMoving ? 'Pause' : 'Play'}
+                className={styles.playPauseButton}
+                onClick={isMoving ? handlePause : handlePlay}
+                disabled={!isLoaded}
+              >
+                {isMoving ? (
+                  <IoPauseSharp size={22} aria-hidden />
+                ) : (
+                  <IoPlaySharp size={22} aria-hidden />
+                )}
+              </button>
+              <button
+                type="button"
+                title="Next segment"
+                aria-label="Next segment"
+                className={styles.segmentButton}
+                onClick={handleNextSegment}
+                disabled={!canGoNext}
+              >
+                <IoPlaySkipForwardSharp size={18} aria-hidden />
+              </button>
+            </div>
+            <div className={styles.transportBalance} aria-hidden />
+          </div>
         </div>
       )}
     </section>

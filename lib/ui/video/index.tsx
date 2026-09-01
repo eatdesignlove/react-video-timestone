@@ -9,7 +9,7 @@ const Video = memo(
         <video
           className={styles.video}
           key={url}
-          src={url}
+          src={url || undefined}
           ref={ref}
           loop={loop}
           onLoadedData={onLoadedData}
